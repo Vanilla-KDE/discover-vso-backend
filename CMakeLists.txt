@@ -5,10 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
-# DiscoverCommon is a static library linked into this MODULE plugin, so it must
-# be built with -fPIC. discover/CMakeLists.txt normally does this via
-# KDECMakeSettings, which we bypass by adding discover/libdiscover directly.
+
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(QT_MIN_VERSION "6.6.0")
 set(KF6_MIN_VERSION "5.240.0")

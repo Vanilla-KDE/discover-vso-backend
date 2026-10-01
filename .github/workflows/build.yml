@@ -1,0 +1,109 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    container:
+      image: ghcr.io/vanilla-os/pico:latest
+
+    steps:
+      - name: Install git
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends git ca-certificates
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential \
+            cmake \
+            extra-cmake-modules \
+            gettext \
+            pkg-config \
+            qt6-base-dev \
+            qt6-declarative-dev \
+            libkf6auth-dev \
+            libkf6coreaddons-dev \
+            libkf6i18n-dev \
+            libkf6itemmodels-dev \
+            libkf6kio-dev \
+            libkf6xmlgui-dev \
+            libkf6config-dev \
+            libkf6crash-dev \
+            libkf6dbusaddons-dev \
+            libkf6archive-dev \
+            libkf6notifications-dev \
+            libkf6purpose-dev \
+            libkf6statusnotifieritem-dev \
+            libkf6iconthemes-dev \
+            libkf6idletime-dev \
+            libkf6kcmutils-dev \
+            libkf6newstuff-dev \
+            libkf6attica-dev \
+            libkirigami-dev \
+            kirigami-addons-dev \
+            qcoro-qt6-dev \
+            libappstreamqt-dev \
+            libpackagekitqt6-dev \
+            libflatpak-dev \
+            libfwupd-dev \
+            libostree-dev \
+            libmarkdown2-dev
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Package
+        run: |
+          mkdir -p dist
+          cp build/libvanillavso-backend.so "dist/libvanillavso-backend_${{ matrix.arch }}.so"
+          cp build/vanillavso_kauth_helper "dist/vanillavso_kauth_helper_${{ matrix.arch }}"
+          (cd dist && sha256sum "libvanillavso-backend_${{ matrix.arch }}.so" "vanillavso_kauth_helper_${{ matrix.arch }}" > "checksums_${{ matrix.arch }}.txt")
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vanillavso-backend-${{ matrix.arch }}
+          path: dist/*
+
+  continuous-release:
+    name: Continuous release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          tag_name: "continuous"
+          prerelease: true
+          name: "Continuous Build"
+          files: dist/**/*
