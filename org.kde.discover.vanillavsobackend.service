@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.kde.discover.vanillavsobackend
+Exec=/usr/lib/kf6/kauth/libexec/vanillavso_kauth_helper
+User=root

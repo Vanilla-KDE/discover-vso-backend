@@ -1,0 +1,13 @@
+[org.kde.discover.vanillavsobackend.check]
+Name=Check for Vanilla OS system updates
+Name[zh_CN]=检查 Vanilla OS 系统更新
+Description=Run "vso upgrade check --json" to check whether a system update is available
+Description[zh_CN]=运行“vso upgrade check --json”以检查是否有可用的系统更新
+Policy=yes
+
+[org.kde.discover.vanillavsobackend.upgrade]
+Name=Upgrade the Vanilla OS system
+Name[zh_CN]=升级 Vanilla OS 系统
+Description=Run "vso upgrade --now" to update the Vanilla OS system to the latest version
+Description[zh_CN]=运行“vso upgrade --now”以将 Vanilla OS 系统升级到最新版本
+Policy=yes
