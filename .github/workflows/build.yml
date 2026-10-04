@@ -80,8 +80,8 @@ jobs:
         run: |
           mkdir -p dist
           cp build/libvanillavso-backend.so "dist/libvanillavso-backend_${{ matrix.arch }}.so"
-          cp build/vanillavso_kauth_helper "dist/vanillavso_kauth_helper_${{ matrix.arch }}"
-          (cd dist && sha256sum "libvanillavso-backend_${{ matrix.arch }}.so" "vanillavso_kauth_helper_${{ matrix.arch }}" > "checksums_${{ matrix.arch }}.txt")
+          cp build/vanillavso_kauth_helper "dist/vanillavso_kauth_helper_${{ matrix.arch }}.bin"
+          (cd dist && sha256sum "libvanillavso-backend_${{ matrix.arch }}.so" "vanillavso_kauth_helper_${{ matrix.arch }}.bin" > "checksums_${{ matrix.arch }}.txt")
 
       - uses: actions/upload-artifact@v4
         with:
