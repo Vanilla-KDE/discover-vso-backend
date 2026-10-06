@@ -33,8 +33,15 @@ find_package(KF6 REQUIRED COMPONENTS
 find_package(KF6Auth REQUIRED CONFIG)
 find_package(QCoro6 REQUIRED COMPONENTS Core)
 
-set(DISCOVER_PLUGIN_IID ${PROJECT_VERSION})
-set(DISCOVER_NOTIFIER_IID ${PROJECT_VERSION})
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/discover/CMakeLists.txt" _discover_version_line
+    REGEX "^[ \t]*set\\(PROJECT_VERSION ")
+if(NOT _discover_version_line)
+    message(FATAL_ERROR "Could not determine the Plasma Discover version from discover/CMakeLists.txt")
+endif()
+string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" DISCOVER_VERSION "${_discover_version_line}")
+
+set(DISCOVER_PLUGIN_IID ${DISCOVER_VERSION})
+set(DISCOVER_NOTIFIER_IID ${DISCOVER_VERSION})
 string(PREPEND DISCOVER_PLUGIN_IID "org.kde.discover.")
 string(APPEND DISCOVER_PLUGIN_IID ".AbstractResourcesBackendFactory")
 string(PREPEND DISCOVER_NOTIFIER_IID "org.kde.discover.")
